@@ -20,47 +20,61 @@ void Send_String(char ar[]){
 }
 
 
+
 void Return_String(char *str){
-	for(int i=0;i<100;i++){
-
+	for(int i=0;i<200;i++){
+		
 		*str = USART_Receive();
+		
 		str++;
 	}
+	*str='\0';
 	
 }
-char GPRMC[100];
 
-void Get_gprmc(char *str){
-	char tempstr[100];
-	char *tempptr = str;
-	for(int i=0;i<100;i++){
-		tempstr[i] = *str;
+	char GPRMC[100];
+void return_gprmc(char *str){
+	char temparr[200];
+
+	for(int i=0;i<200;i++){
+		temparr[i]=*str;
 		str++;
+		
 	}
-	char *gprmc = strstr(tempstr,"GPRMC");
-	int position = tempptr-gprmc;
-	
 
-	while(tempstr[position]!='$'){
-		GPRMC[position] = tempstr[position];
-		position++;
+	char *loc = strstr(temparr,"GPRMC");
+
+	
+	int i=0;
+	if(loc){
+		while((*loc!='\n')){
+			GPRMC[i]=*loc;
+			//USART_Transmit(GPRMC[i]);
+			i++;
+			loc++;
+		}
+		GPRMC[i]='\0';
+
 	}
-	GPRMC[position]='\0';
+	else{}
+	
 	
 }
+
+
 
 int main(void)
 {	USART_Init();
     /* Replace with your application code */
     while (1) 
-    {	
-		char str[100];
+    {
+		char str[200];
 		
 		Return_String(str);
-		_delay_ms(5000);
-		Get_gprmc(str);
-		_delay_ms(1000);
-		Send_String(GPRMC);
+		return_gprmc(str);
+			Send_String(GPRMC);
+			_delay_ms(1000);
+			USART_Transmit('\n');
 		
     }
 }
